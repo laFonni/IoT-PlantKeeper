@@ -1,12 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
+import { AuthContext } from '../AuthContext';
 
-const WiFiList = ({ token }) => {
+const WiFiList = () => {
+    const { token } = useContext(AuthContext); // Access token from AuthContext
     const [networks, setNetworks] = useState([]);
 
     useEffect(() => {
         const fetchWiFiNetworks = async () => {
-            console.log('Token in WiFiList:', token);
+
+            if (!token) {
+                console.error('No token available in WiFiList');
+                return;
+            }
 
             try {
                 const response = await axios.get('http://localhost:4000/wifi', {

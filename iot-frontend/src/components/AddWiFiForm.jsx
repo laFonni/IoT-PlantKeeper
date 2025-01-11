@@ -1,18 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
+import { AuthContext } from '../AuthContext';
 
-const AddWiFiForm = ({ token }) => {
+const AddWiFiForm = ({ onAddWiFi }) => {
+    const { token } = useContext(AuthContext); // Access token from AuthContext
     const [ssid, setSsid] = useState('');
     const [password, setPassword] = useState('');
     const [status, setStatus] = useState('');
 
     const handleAddWiFi = async (e) => {
         e.preventDefault();
-    
+
         try {
-            console.log('Payload:', { ssid, password });
-            console.log('Authorization header:', `Bearer ${token}`);
-            console.log('Token in AddWiFiForm:', token); // Debug log to verify token
             const response = await axios.post(
                 'http://localhost:4000/wifi',
                 { ssid, password },
@@ -22,7 +21,9 @@ const AddWiFiForm = ({ token }) => {
             setStatus('WiFi added successfully!');
             setSsid('');
             setPassword('');
-            onAddWiFi(response.data); // Update parent state
+            if (onAddWiFi) {
+                onAddWiFi(response.data); // Call parent handler with new network
+            }
         } catch (err) {
             console.error('Failed to add WiFi:', err);
             setStatus('Failed to add WiFi.');
