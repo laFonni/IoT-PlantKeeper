@@ -32,6 +32,9 @@
 #define WIFI_SUCCESS 1
 #define LED_GPIO 2
 
+#define I2C_SDA_PIN  GPIO_NUM_18
+#define I2C_SCL_PIN  GPIO_NUM_19
+
 // BLE Configuration
 #define NVS_NAMESPACE "wifi_config"
 #define NVS_KEY_SSID "ssid"
@@ -480,3 +483,16 @@ void app_main(void) {
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
+
+// void app_main() {
+//     i2c_device_t i2c;
+//     i2c_init(&i2c, I2C_SDA_PIN, I2C_SCL_PIN, "I2C_TEST");
+    
+//     int32_t result;
+//     get_calibration_params(i2c);
+//     trigger_measurment(i2c);
+//     read_temp(i2c, &result);
+//     printf("Raw temperature: %ld\n", result);
+//     int32_t temp = bmp280_compensate_T_int32(result);
+//     printf("Compensated temperature: %ld\n", temp);
+// }
