@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import WiFiList from '../components/WiFiList';
 import AddWiFiForm from '../components/AddWiFiForm';
+import DeviceList from '../components/DeviceList';
 
 const DashboardPage = ({ token }) => {
     const [showAddWiFiForm, setShowAddWiFiForm] = useState(false);
@@ -20,6 +21,7 @@ const DashboardPage = ({ token }) => {
             </button>
             {showAddWiFiForm && <AddWiFiForm token={token} />}
             <WiFiList token={token} />
+            <DeviceList token={token} />
         </div>
     );
 };

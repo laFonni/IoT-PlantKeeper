@@ -6,6 +6,7 @@ import DashboardPage from './pages/DashboardPage';
 import WiFiPage from './pages/WiFiPage';
 import ProtectedRoute from './ProtectedRoute';
 import AuthProvider from './AuthContext';
+import DevicePage from './pages/DevicePage';
 
 const App = () => (
     <AuthProvider>
@@ -26,6 +27,14 @@ const App = () => (
                     element={
                         <ProtectedRoute>
                             <WiFiPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/device/:deviceId"
+                    element={
+                        <ProtectedRoute>
+                            <DevicePage />
                         </ProtectedRoute>
                     }
                 />

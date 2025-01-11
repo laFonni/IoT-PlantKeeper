@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const DeviceList = ({ token, onSelectDevice }) => {
+const DeviceList = ({ token }) => {
+  const navigate = useNavigate();
   const [devices, setDevices] = useState([]);
 
   useEffect(() => {
@@ -32,10 +34,10 @@ const DeviceList = ({ token, onSelectDevice }) => {
               <p className="text-sm text-gray-500">MAC: {device.macAddress}</p>
             </div>
             <button
-              onClick={() => onSelectDevice(device.id)}
+              onClick={() => navigate(`/device/${device.id}`)}
               className="bg-blue-500 text-white py-1 px-3 rounded-md hover:bg-blue-600 transition"
             >
-              Control
+              View Details
             </button>
           </li>
         ))}
