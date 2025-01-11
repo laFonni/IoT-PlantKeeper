@@ -7,6 +7,7 @@ import AddDeviceForm from '../components/AddDeviceForm';
 const DashboardPage = ({ token }) => {
     const [showAddWiFiForm, setShowAddWiFiForm] = useState(false);
     const [showAddDeviceForm, setShowAddDeviceForm] = useState(false);
+    const [devices, setDevices] = useState([]);
 
     const toggleAddWiFiForm = () => {
         setShowAddWiFiForm((prev) => !prev);
@@ -17,8 +18,7 @@ const DashboardPage = ({ token }) => {
     };
 
     const handleAddDevice = (newDevice) => {
-        console.log('Adding new device to state:', newDevice);
-        // You can update the device list state here if needed
+        setDevices((prevDevices) => [...prevDevices, newDevice]);
     };
 
     return (
@@ -39,7 +39,7 @@ const DashboardPage = ({ token }) => {
             </button>
             {showAddDeviceForm && <AddDeviceForm token={token} onAddDevice={handleAddDevice} />}
             <WiFiList token={token} />
-            <DeviceList token={token} />
+            <DeviceList token={token} devices={devices} />
         </div>
     );
 };
