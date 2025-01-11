@@ -6,14 +6,25 @@ const jwt = require('jsonwebtoken');
 const mqtt = require('mqtt');
 const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcrypt');
+const cors = require('cors');
+
 
 // Initialize application
 const app = express();
-const port = 3000;
+const port = 4000;
+
+
+// Middleware CORS
+app.use(cors());
 
 
 // Middleware setup
 app.use(bodyParser.json());
+
+app.use(cors({
+    origin: 'http://localhost:5173', // Adres Twojego frontendu
+  }));
+  
 
 // Secret for JWT
 const JWT_SECRET = 'your_secret_key';
@@ -98,6 +109,8 @@ app.get('/', (req, res) => {
 
 // API routes
 app.post('/register', async (req, res) => {
+    console.log('Request received:', req.body); // Dodaj logowanie
+
     const { email, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -106,8 +119,10 @@ app.post('/register', async (req, res) => {
         [email, hashedPassword],
         (err) => {
             if (err) {
+                console.error('Error inserting user:', err); // Logowanie błędów
                 res.status(400).send('User already exists');
             } else {
+                console.log('User registered:', email); // Logowanie sukcesu
                 res.status(201).send('User registered');
             }
         }
