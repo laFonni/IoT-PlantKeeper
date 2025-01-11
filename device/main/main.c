@@ -218,13 +218,21 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
     }
 }
 
-// Add this function to generate random sensor values (for demonstration)
+// Add i2c_device_t as a global variable
+static i2c_device_t i2c;
+
+// Modify generate_sensor_value to handle real temperature readings
 static float generate_sensor_value(int sensor_type) {
+    static int32_t result;
+    
     switch (sensor_type) {
         case 0: // Soil moisture (0-100%)
             return (float)(rand() % 100);
-        case 1: // Temperature (15-35°C)
-            return 15.0 + ((float)(rand() % 200) / 10.0);
+        case 1: // Temperature (from sensor)
+            trigger_measurment(i2c);
+            read_temp(i2c, &result);
+            int32_t temp = bmp280_compensate_T_int32(result);
+            return (float)temp / 100.0; // Convert to degrees Celsius
         case 2: // Water pump (0-1)
             return (float)(rand() % 2);
         case 3: // Light sensor (0-1000 lux)
@@ -474,6 +482,10 @@ void app_main(void) {
 
     // Initialize WiFi
     wifi_init();
+
+    // Initialize I2C (moved before the main loop)
+    i2c_init(&i2c, I2C_SDA_PIN, I2C_SCL_PIN, "I2C_TEST");
+    get_calibration_params(i2c);
 
     // Main loop
     while (1) {
