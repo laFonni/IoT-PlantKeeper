@@ -9,16 +9,18 @@ const LoginForm = ({ onLogin }) => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-
+    
         try {
             const response = await axios.post('http://localhost:4000/login', { email, password });
-            setStatus('Login successful!');
-            onLogin(response.data.token); // Przekazanie tokena do LoginPage
+            localStorage.setItem('token', response.data.token); // Save to localStorage
+            onLogin(response.data.token); // Pass token to context
         } catch (err) {
-            console.error('Login error:', err.response || err.message); // Logowanie błędów
-            setStatus(err.response?.data || 'Invalid credentials'); // Wyświetlanie błędu backendu, jeśli istnieje
+            console.error('Login failed:', err);
+            setStatus('Invalid credentials');
         }
     };
+    
+    
 
     return (
         <form onSubmit={handleLogin} className="flex flex-col gap-4 p-6 bg-white rounded-md shadow-md">

@@ -1,12 +1,11 @@
-import React, { useContext, useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import AddWiFiForm from '../components/AddWiFiForm';
 import WiFiList from '../components/WiFiList';
 import { AuthContext } from '../AuthContext';
+import axios from 'axios';
 
 const WiFiPage = () => {
-    const { token } = useContext(AuthContext);
-    console.log('Token in WiFiPage:', token);
-
+    const { token } = useContext(AuthContext); // Access token from AuthContext
     const [networks, setNetworks] = useState([]);
 
     const fetchWiFiNetworks = async () => {
@@ -20,18 +19,19 @@ const WiFiPage = () => {
         }
     };
 
+    const handleAddWiFi = (newNetwork) => {
+        console.log('Adding new network to state:', newNetwork);
+        setNetworks((prevNetworks) => [...prevNetworks, newNetwork]); // Update networks state
+    };
+
     useEffect(() => {
         fetchWiFiNetworks();
     }, [token]);
 
-    const handleAddWiFi = (newNetwork) => {
-        setNetworks((prevNetworks) => [...prevNetworks, newNetwork]);
-    };
-
     return (
         <div className="p-6">
-            <AddWiFiForm token={token} onAddWiFi={handleAddWiFi} />
-            <WiFiList token={token} />
+            <AddWiFiForm onAddWiFi={handleAddWiFi} /> {/* Pass handleAddWiFi */}
+            <WiFiList networks={networks} />
         </div>
     );
 };

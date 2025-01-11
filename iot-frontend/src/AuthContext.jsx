@@ -18,6 +18,7 @@ const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
+        console.log('Clearing token from AuthContext');
         setToken(null);
         localStorage.removeItem('token');
     };
