@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
-import DashboardPage from './DashboardPage';
 
 const LoginPage = () => {
-  const [token, setToken] = useState('');
+    const [token, setToken] = useState('');
+    const navigate = useNavigate();
 
-  if (token) {
-    return <DashboardPage token={token} />;
-  }
+    const handleLogin = (newToken) => {
+        setToken(newToken);
+        localStorage.setItem('token', newToken); // Zapisanie tokena w localStorage
+        navigate('/dashboard'); // Przekierowanie na dashboard
+    };
 
-  return <LoginForm onLogin={setToken} />;
+    return <LoginForm onLogin={handleLogin} />;
 };
 
 export default LoginPage;

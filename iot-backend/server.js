@@ -71,10 +71,20 @@ function initializeDatabase() {
     )`);
 
     db.run(`CREATE TABLE IF NOT EXISTS IoTDevices (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    macAddress TEXT UNIQUE,
+    wifiId INTEGER,
+    userId INTEGER,
+    FOREIGN KEY(userId) REFERENCES Users(id),
+    FOREIGN KEY(wifiId) REFERENCES WiFiNetworks(id)
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS WiFiNetworks (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        macAddress TEXT UNIQUE,
-        userId INTEGER,
+        ssid TEXT NOT NULL,
+        password TEXT NOT NULL,
+        userId INTEGER NOT NULL,
         FOREIGN KEY(userId) REFERENCES Users(id)
     )`);
 
@@ -144,20 +154,26 @@ app.post('/login', (req, res) => {
 });
 
 app.post('/devices', authenticate, (req, res) => {
-    const { name, macAddress } = req.body;
+    const { name, macAddress, wifiId } = req.body;
+
+    if (!name || !macAddress || !wifiId) {
+        return res.status(400).send('Name, MAC address, and WiFi ID are required');
+    }
 
     db.run(
-        'INSERT INTO IoTDevices (name, macAddress, userId) VALUES (?, ?, ?)',
-        [name, macAddress, req.user.id],
-        (err) => {
+        'INSERT INTO IoTDevices (name, macAddress, wifiId) VALUES (?, ?, ?)',
+        [name, macAddress, wifiId],
+        function (err) {
             if (err) {
-                res.status(400).send('Device registration failed');
-            } else {
-                res.status(201).send('Device registered');
+                console.error('Failed to register device:', err);
+                return res.status(500).send('Failed to register device');
             }
+
+            res.status(201).send({ id: this.lastID, name, macAddress });
         }
     );
 });
+
 
 app.get('/devices', authenticate, (req, res) => {
     db.all(
@@ -188,6 +204,91 @@ app.get('/telemetry/:deviceId', authenticate, (req, res) => {
         }
     );
 });
+
+app.get('/wifi/:wifiId/devices', authenticate, (req, res) => {
+    const { wifiId } = req.params;
+
+    db.all(
+        'SELECT * FROM IoTDevices WHERE wifiId = ?',
+        [wifiId],
+        (err, devices) => {
+            if (err) {
+                console.error('Failed to fetch devices:', err);
+                return res.status(500).send('Failed to fetch devices');
+            }
+
+            res.send(devices);
+        }
+    );
+});
+
+
+app.post('/wifi', authenticate, (req, res) => {
+    const { ssid, password } = req.body;
+
+    if (!ssid || !password) {
+        return res.status(400).send('SSID and password are required');
+    }
+
+    db.run(
+        'INSERT INTO WiFiNetworks (ssid, password, userId) VALUES (?, ?, ?)',
+        [ssid, password, req.user.id],
+        function (err) {
+            if (err) {
+                console.error('Failed to add WiFi network:', err);
+                return res.status(500).send('Failed to add WiFi network');
+            }
+
+            res.status(201).send({ id: this.lastID, ssid });
+        }
+    );
+});
+
+app.get('/wifi', authenticate, (req, res) => {
+    console.log('Authorization header:', req.headers['authorization']);
+    db.all(
+        'SELECT id, ssid FROM WiFiNetworks WHERE userId = ?',
+        [req.user.id],
+        (err, networks) => {
+            if (err) {
+                console.error('Failed to fetch WiFi networks:', err);
+                return res.status(500).send('Failed to fetch WiFi networks');
+            }
+
+            res.send(networks);
+        }
+    );
+});
+
+
+
+
+app.post('/devices/:deviceId/wifi', authenticate, (req, res) => {
+    const { deviceId } = req.params;
+    const { wifiId } = req.body;
+
+    if (!wifiId) {
+        return res.status(400).send('WiFi ID is required');
+    }
+
+    db.run(
+        'UPDATE IoTDevices SET wifiId = ? WHERE id = ? AND userId = ?',
+        [wifiId, deviceId, req.user.id],
+        function (err) {
+            if (err) {
+                console.error('Failed to update device WiFi:', err);
+                return res.status(500).send('Failed to update device WiFi');
+            }
+
+            if (this.changes === 0) {
+                return res.status(404).send('Device not found or not owned by user');
+            }
+
+            res.status(200).send('Device WiFi updated');
+        }
+    );
+});
+
 
 // Start the server
 app.listen(port, () => {
