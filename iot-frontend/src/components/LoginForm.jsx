@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const LoginForm = ({ onLogin }) => {
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [status, setStatus] = useState('');
@@ -14,12 +15,12 @@ const LoginForm = ({ onLogin }) => {
             const response = await axios.post('http://localhost:4000/login', { email, password });
             localStorage.setItem('token', response.data.token); // Save to localStorage
             onLogin(response.data.token); // Pass token to context
+            navigate('/dashboard');
         } catch (err) {
             console.error('Login failed:', err);
             setStatus('Invalid credentials');
         }
     };
-    
     
 
     return (

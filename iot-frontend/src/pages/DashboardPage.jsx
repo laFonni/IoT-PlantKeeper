@@ -59,25 +59,30 @@ const DashboardPage = () => {
     };
 
     return (
-        <div className="p-6 bg-background min-h-screen">
-            <h1 className="text-3xl font-bold mb-6 text-primary">Dashboard</h1>
-            <button
-                onClick={toggleAddWiFiForm}
-                className="mb-4 bg-primary text-white py-2 px-4 rounded-md hover:bg-secondary transition"
-            >
-                {showAddWiFiForm ? 'Cancel' : 'Add WiFi Network'}
-            </button>
-            {showAddWiFiForm && <AddWiFiForm onAddWiFi={handleWiFiAdded} />}
-            <button
-                onClick={toggleAddDeviceForm}
-                className="mb-4 bg-secondary text-white py-2 px-4 rounded-md hover:bg-primary transition"
-            >
-                {showAddDeviceForm ? 'Cancel' : 'Add Device'}
-            </button>
-            {showAddDeviceForm && <AddDeviceForm onAddDevice={handleDeviceAdded} />}
-
-            <WiFiList networks={wifiNetworks} />
-            <DeviceList devices={devices} />
+        <div className="p-6 bg-background min-h-screen mt-16">
+            <h1 className="text-3xl font-bold mb-6 text-primary text-center">Dashboard</h1>
+            <div className="flex flex-col items-center">
+                <button
+                    onClick={toggleAddWiFiForm}
+                    className="mb-4 bg-primary text-white py-2 px-4 rounded-md hover:bg-secondary transition"
+                >
+                    {showAddWiFiForm ? 'Cancel' : 'Add WiFi Network'}
+                </button>
+                {showAddWiFiForm && <AddWiFiForm onAddWiFi={handleWiFiAdded} />}
+                <button
+                    onClick={toggleAddDeviceForm}
+                    className="mb-4 bg-secondary text-white py-2 px-4 rounded-md hover:bg-primary transition"
+                >
+                    {showAddDeviceForm ? 'Cancel' : 'Add Device'}
+                </button>
+                {showAddDeviceForm && <AddDeviceForm onAddDevice={handleDeviceAdded} />}
+            </div>
+            <div className="flex flex-col items-center mt-6">
+                <WiFiList networks={wifiNetworks} />
+            </div>
+            <div className="flex flex-col items-center mt-6">
+                <DeviceList devices={devices} />
+            </div>
         </div>
     );
 };

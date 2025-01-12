@@ -137,7 +137,7 @@ const DevicePage = () => {
   ];
 
   return (
-    <div className="p-6 max-w-6xl mx-auto bg-background">
+    <div className="p-6 max-w-6xl mx-auto bg-background mt-16">
       <h1 className="text-3xl font-bold mb-6 text-primary">Device {deviceId} Sensors</h1>
       <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
         {charts.map((chart, index) => (
