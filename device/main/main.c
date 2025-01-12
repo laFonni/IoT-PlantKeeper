@@ -4,8 +4,10 @@
 #include <driver/gpio.h>
 
 #include "iot_wifi.h"
+#include "iot_moisture.h"
 #include "iot_ble.h"
 #include "iot_analog.h"
+#include "iot_led.h"
 #include "iot_reconfigure.h"
 #include "iot_nvs.h"
 #include "iot_mqtt.h"
@@ -25,6 +27,12 @@
 #define ADC_ATTEN          ADC_ATTEN_DB_12 // Maximum input voltage ~3.6V
 #define ADC_UNIT           ADC_UNIT_1      // Use ADC1
 
+// Moisture sensor config
+#define SOIL_GPIO GPIO_NUM_5
+
+// Light config
+#define LIGHT_GPIO GPIO_NUM_21
+
 void app_main(void) {
     iot_nvs_init();
     iot_ble_init();
@@ -35,7 +43,9 @@ void app_main(void) {
     i2c_init(&i2c, I2C_SDA_PIN, I2C_SCL_PIN, "I2C_TEST");
     get_calibration_params(i2c);
 
-    iot_photoresistor_init(ADC_UNIT, ADC_CHANNEL, ADC_ATTEN);    
+    iot_photoresistor_init(ADC_UNIT, ADC_CHANNEL, ADC_ATTEN);
+    iot_soil_moisture_init(SOIL_GPIO);  
+    iot_light_init(LIGHT_GPIO);
 
     char ssid[64], pass[64];
     get_wifi_credentials_nvs(ssid, pass);
@@ -49,6 +59,12 @@ void app_main(void) {
             int32_t temperature = bmp280_compensate_T_int32(result);
             printf("Temperature: %f\n", temperature / 100.0);
             printf("Light: %ld\n", iot_photoresistor_get(ADC_CHANNEL));
+            printf("Is wet: %d\n", is_soil_wet(SOIL_GPIO));
+
+            gpio_set_level(LIGHT_GPIO, 1);
+            vTaskDelay(500 / portTICK_PERIOD_MS);
+            gpio_set_level(LIGHT_GPIO, 0);
+            vTaskDelay(500 / portTICK_PERIOD_MS);
         }
 
         vTaskDelay(2000 / portTICK_PERIOD_MS);
