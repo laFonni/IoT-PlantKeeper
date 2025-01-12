@@ -119,6 +119,15 @@ static void example_exec_write_event_env(prepare_type_env_t *prepare_write_env, 
 
 void iot_ble_init(void) {
     esp_err_t ret;
+    ret = esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT);
+    if (ret) {
+        printf("%s mem release failed: %s\n", __func__, esp_err_to_name(ret));
+        return;
+    }
+}
+
+void iot_ble_start(void) {
+    esp_err_t ret;
     // ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));
 
     esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
@@ -166,7 +175,7 @@ void iot_ble_init(void) {
     }
 }
 
-void iot_ble_deinit(void) {
+void iot_ble_stop(void) {
     esp_err_t err;
     err = esp_bluedroid_disable();
     if (err) {

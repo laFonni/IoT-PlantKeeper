@@ -7,9 +7,8 @@
 #include "iot_mqtt.h"
 
 bool wifi_connected = false;
-EventGroupHandle_t  wifi_event_group;
-esp_event_handler_instance_t wifi_handler_event_instance;
-esp_event_handler_instance_t got_ip_event_instance;
+static esp_event_handler_instance_t wifi_handler_event_instance;
+static esp_event_handler_instance_t got_ip_event_instance;
 
 static void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data) {
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
@@ -34,27 +33,9 @@ static void ip_event_handler(void* arg, esp_event_base_t event_base, int32_t eve
         ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
         printf("Uzyskany adres IP: " IPSTR "\n", IP2STR(&event->ip_info.ip));
 
-        char mqtt_url[64];
-        size_t mqtt_url_len = 64;
-        esp_err_t ret;
-        nvs_handle_t nvs_handle;
-        nvs_open(NVS_NAMESPACE, NVS_READWRITE, &nvs_handle);
-        ret = nvs_get_str(nvs_handle, NVS_KEY_MQTT_URL, mqtt_url, &mqtt_url_len);
-        if (ret == ESP_OK) {
-            printf("MQTT URL: %s\n", mqtt_url);
-            
-            char mqtt_full_url[32] = "mqtt://";
-            strncat(mqtt_full_url, mqtt_url, strlen(mqtt_url) + 1);
-            printf("Full MQTT URL: %s\n", mqtt_full_url);
-            
-            iot_mqtt_init(mqtt_full_url);
-        } else {
-            printf("%s mqtt url nvs_get_str failed: %s\n", __func__, esp_err_to_name(ret));
-            printf("mqtt_url not set\n");
-        }
-        nvs_close(nvs_handle);
-
-        // xEventGroupSetBits(wifi_event_group, WIFI_SUCCESS);
+        char mqtt_uri[64];
+        get_mqtt_uri(mqtt_uri);
+        iot_mqtt_init(mqtt_uri);
     }
 }
 
@@ -89,15 +70,8 @@ void iot_wifi_start(const char* ssid, const char* pass) {
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
     ESP_ERROR_CHECK(esp_wifi_start());
-
-    // EventBits_t bits = xEventGroupWaitBits(wifi_event_group, WIFI_SUCCESS, pdFALSE, pdFALSE, portMAX_DELAY);
-    // if (!(bits & WIFI_SUCCESS)) {
-    //     printf("Wystąpił nieoczekiwany błąd przy łączeniu z Wi-Fi.\n");
-    // }
 }
 
 void iot_wifi_stop(void) {
-    // wifi_event_group = NULL;
-    // esp_wifi_disconnect();
     esp_wifi_stop();
 }

@@ -11,3 +11,5 @@
 
 void iot_nvs_init(void);
 esp_err_t save_wifi_config_to_nvs(const char* key, const char* value, size_t length);
+esp_err_t get_wifi_credentials_nvs(char* ssid, char* pass);
+esp_err_t get_mqtt_uri(char* uri);

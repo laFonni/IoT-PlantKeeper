@@ -16,4 +16,5 @@
 #define GATTS_TAG "GATTS"
 
 void iot_ble_init(void);
-void iot_ble_deinit(void);
+void iot_ble_start(void);
+void iot_ble_stop(void);
