@@ -137,12 +137,12 @@ const DevicePage = () => {
   ];
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Device {deviceId} Sensors</h1>
+    <div className="p-6 max-w-6xl mx-auto bg-background">
+      <h1 className="text-3xl font-bold mb-6 text-primary">Device {deviceId} Sensors</h1>
       <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
         {charts.map((chart, index) => (
-          <div key={index} className="bg-white p-4 rounded-lg shadow-lg">
-            <h2 className="text-xl font-semibold mb-4">{chart.title}</h2>
+          <div key={index} className="bg-white p-4 rounded-lg shadow-lg border border-secondary">
+            <h2 className="text-xl font-semibold mb-4 text-secondary">{chart.title}</h2>
             <div className="h-96">
               <Line options={chartOptions} data={chart.data} />
             </div>

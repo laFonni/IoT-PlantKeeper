@@ -17,26 +17,26 @@ const DashboardPage = () => {
     };
 
     return (
-        <div className="p-6">
-            <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
-            <button
-                onClick={toggleAddWiFiForm}
-                className="mb-4 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition"
-            >
-                {showAddWiFiForm ? 'Cancel' : 'Add WiFi Network'}
-            </button>
-            {showAddWiFiForm && <AddWiFiForm />}
-            <button
-                onClick={toggleAddDeviceForm}
-                className="mb-4 bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition"
-            >
-                {showAddDeviceForm ? 'Cancel' : 'Add Device'}
-            </button>
-            {showAddDeviceForm && <AddDeviceForm />}
-            <WiFiList />
-            <DeviceList />
+        <div className="p-6 bg-background min-h-screen">
+          <h1 className="text-3xl font-bold mb-6 text-primary">Dashboard</h1>
+          <button
+            onClick={toggleAddWiFiForm}
+            className="mb-4 bg-primary text-white py-2 px-4 rounded-md hover:bg-secondary transition"
+          >
+            {showAddWiFiForm ? 'Cancel' : 'Add WiFi Network'}
+          </button>
+          {showAddWiFiForm && <AddWiFiForm />}
+          <button
+            onClick={toggleAddDeviceForm}
+            className="mb-4 bg-secondary text-white py-2 px-4 rounded-md hover:bg-primary transition"
+          >
+            {showAddDeviceForm ? 'Cancel' : 'Add Device'}
+          </button>
+          {showAddDeviceForm && <AddDeviceForm />}
+          <WiFiList />
+          <DeviceList />
         </div>
-    );
+      );
 };
 
 export default DashboardPage;
