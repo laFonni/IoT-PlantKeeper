@@ -6,6 +6,7 @@ import DashboardPage from './pages/DashboardPage';
 import WiFiPage from './pages/WiFiPage';
 import ProtectedRoute from './ProtectedRoute';
 import AuthProvider from './AuthContext';
+import BluetoothSetup from './components/BluetoothSetup';
 import DevicePage from './pages/DevicePage';
 import Navbar from './components/Navbar';
 
@@ -46,6 +47,15 @@ const App = () => (
           }
         />
         <Route
+
+                    path="/bluetooth-setup"
+                    element={
+                        <ProtectedRoute>
+                            <BluetoothSetup />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
           path="/device/:deviceId"
           element={
             <ProtectedRoute>

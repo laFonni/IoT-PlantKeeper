@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import WiFiList from '../components/WiFiList';
 import AddWiFiForm from '../components/AddWiFiForm';
 import DeviceList from '../components/DeviceList';
@@ -9,6 +10,7 @@ import axios from 'axios';
 const DashboardPage = () => {
     const { token } = useContext(AuthContext);
     const [showAddWiFiForm, setShowAddWiFiForm] = useState(false);
+    const navigate = useNavigate(); // Use React Router's navigation hook
     const [showAddDeviceForm, setShowAddDeviceForm] = useState(false);
     const [wifiNetworks, setWifiNetworks] = useState([]);
     const [devices, setDevices] = useState([]);
@@ -62,25 +64,35 @@ const DashboardPage = () => {
         <div className="p-6 bg-background min-h-screen mt-16">
             <h1 className="text-3xl font-bold mb-6 text-primary text-center">Dashboard</h1>
             <div className="flex flex-col items-center">
-                <button
-                    onClick={toggleAddWiFiForm}
-                    className="mb-4 bg-primary text-white py-2 px-4 rounded-md hover:bg-secondary transition"
-                >
-                    {showAddWiFiForm ? 'Cancel' : 'Add WiFi Network'}
-                </button>
+                <div className="flex space-x-4 mb-4">
+                    {/* Add WiFi Network Toggle */}
+                    <button
+                        onClick={toggleAddWiFiForm}
+                        className="bg-primary text-white py-2 px-4 rounded-md hover:bg-secondary transition"
+                    >
+                        {showAddWiFiForm ? 'Cancel' : 'Add WiFi Network'}
+                    </button>
+                    {/* Navigate to Bluetooth Setup */}
+                    <button
+                        onClick={() => navigate('/bluetooth-setup')}
+                        className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition"
+                    >
+                        Setup Bluetooth
+                    </button>
+                    <button
+                        onClick={toggleAddDeviceForm}
+                        className="bg-secondary text-white py-2 px-4 rounded-md hover:bg-primary transition"
+                    >
+                        {showAddDeviceForm ? 'Cancel' : 'Add Device'}
+                    </button>
+                </div>
                 {showAddWiFiForm && <AddWiFiForm onAddWiFi={handleWiFiAdded} />}
-                <button
-                    onClick={toggleAddDeviceForm}
-                    className="mb-4 bg-secondary text-white py-2 px-4 rounded-md hover:bg-primary transition"
-                >
-                    {showAddDeviceForm ? 'Cancel' : 'Add Device'}
-                </button>
                 {showAddDeviceForm && <AddDeviceForm onAddDevice={handleDeviceAdded} />}
             </div>
-            <div className="flex flex-col items-center mt-6">
+            <div className="flex flex-col items-center mt-6 w-full max-w-4xl">
                 <WiFiList networks={wifiNetworks} />
             </div>
-            <div className="flex flex-col items-center mt-6">
+            <div className="flex flex-col items-center mt-6 w-full max-w-4xl">
                 <DeviceList devices={devices} />
             </div>
         </div>

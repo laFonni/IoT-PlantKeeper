@@ -96,6 +96,21 @@ function initializeDatabase() {
         value REAL,
         FOREIGN KEY(deviceId) REFERENCES IoTDevices(id)
     )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS DeviceStatuses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    deviceId INTEGER NOT NULL,
+    status TEXT NOT NULL,
+    timestamp TEXT NOT NULL
+    );`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS WiFiCredentials (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    deviceId INTEGER NOT NULL,
+    ssid TEXT NOT NULL,
+    password TEXT NOT NULL,
+    timestamp TEXT NOT NULL
+    );`);
 }
 
 // Helper functions
@@ -206,6 +221,43 @@ app.get('/telemetry/:deviceId', authenticate, (req, res) => {
     );
 });
 
+app.get('/wifi', authenticate, (req, res) => {
+    db.all(
+        'SELECT id, ssid FROM WiFiNetworks WHERE userId = ?',
+        [req.user.id],
+        (err, networks) => {
+            if (err) {
+                console.error('Failed to fetch WiFi networks:', err);
+                return res.status(500).send('Failed to fetch WiFi networks');
+            }
+            res.send(networks);
+        }
+    );
+});
+app.delete('/wifi/:id', authenticate, (req, res) => {
+    const { id } = req.params;
+
+    db.run(
+        'DELETE FROM WiFiNetworks WHERE id = ? AND userId = ?',
+        [id, req.user.id],
+        function (err) {
+            if (err) {
+                console.error('Failed to delete WiFi network:', err);
+                return res.status(500).send('Failed to delete WiFi network');
+            }
+
+            if (this.changes === 0) {
+                return res.status(404).send('WiFi network not found or not owned by user');
+            }
+
+            res.status(200).send('WiFi network deleted');
+        }
+    );
+});
+
+
+
+
 app.get('/wifi/:wifiId/devices', authenticate, (req, res) => {
     const { wifiId } = req.params;
 
@@ -245,18 +297,23 @@ app.post('/wifi', authenticate, (req, res) => {
     );
 });
 
-app.get('/wifi', authenticate, (req, res) => {
-    console.log('Authorization header:', req.headers['authorization']);
-    db.all(
-        'SELECT id, ssid FROM WiFiNetworks WHERE userId = ?',
-        [req.user.id],
-        (err, networks) => {
+app.get('/wifi/:ssid', authenticate, (req, res) => {
+    const { ssid } = req.params;
+
+    db.get(
+        'SELECT password FROM WiFiNetworks WHERE ssid = ? AND userId = ?',
+        [ssid, req.user.id],
+        (err, row) => {
             if (err) {
-                console.error('Failed to fetch WiFi networks:', err);
-                return res.status(500).send('Failed to fetch WiFi networks');
+                console.error('Failed to fetch password:', err);
+                return res.status(500).send('Failed to fetch password');
             }
 
-            res.send(networks);
+            if (!row) {
+                return res.status(404).send('Network not found');
+            }
+
+            res.send({ password: row.password });
         }
     );
 });
@@ -286,6 +343,46 @@ app.post('/devices/:deviceId/wifi', authenticate, (req, res) => {
             }
 
             res.status(200).send('Device WiFi updated');
+        }
+    );
+});
+
+app.post('/device-status', (req, res) => {
+    const { deviceId, status } = req.body;
+
+    if (!deviceId || !status) {
+        return res.status(400).send('Device ID and status are required');
+    }
+
+    db.run(
+        'INSERT INTO DeviceStatuses (deviceId, status, timestamp) VALUES (?, ?, ?)',
+        [deviceId, status, new Date().toISOString()],
+        (err) => {
+            if (err) {
+                console.error('Failed to log device status:', err);
+                return res.status(500).send('Failed to log device status');
+            }
+            res.status(201).send('Status logged successfully');
+        }
+    );
+});
+
+app.post('/wifi-credentials', authenticate, (req, res) => {
+    const { ssid, password, deviceId } = req.body;
+
+    if (!ssid || !password || !deviceId) {
+        return res.status(400).send('SSID, password, and device ID are required');
+    }
+
+    db.run(
+        'INSERT INTO WiFiCredentials (deviceId, ssid, password, timestamp) VALUES (?, ?, ?, ?)',
+        [deviceId, ssid, password, new Date().toISOString()],
+        (err) => {
+            if (err) {
+                console.error('Failed to save WiFi credentials:', err);
+                return res.status(500).send('Failed to save WiFi credentials');
+            }
+            res.status(201).send('WiFi credentials saved successfully');
         }
     );
 });

@@ -33,7 +33,7 @@ const DeviceList = ({ devices: propDevices }) => {
   }, [token, propDevices]);
 
   return (
-    <div className="p-6 max-w-3xl mx-auto bg-background">
+    <div className="p-6 w-full max-w-4xl mx-auto bg-background">
       <h2 className="text-2xl font-bold mb-4 text-primary text-center">Your Devices</h2>
       <ul className="space-y-4">
         {deviceList.map((device) => (
