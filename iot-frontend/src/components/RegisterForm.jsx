@@ -30,16 +30,16 @@ const RegisterForm = () => {
   return (
     <form
       onSubmit={handleRegister}
-      className="flex flex-col gap-4 p-6 bg-white rounded-lg shadow-md max-w-md mx-auto mt-10"
+      className="flex flex-col gap-4 p-8 bg-white rounded-lg shadow-lg max-w-md mx-auto mt-12"
     >
-      <h2 className="text-2xl font-bold text-center text-primary">Register</h2>
+      <h2 className="text-3xl font-bold text-center text-primary">Register</h2>
       <input
         type="email"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
-        className="p-2 border rounded-md focus:outline-none focus:ring focus:ring-secondary"
+        className="p-3 border rounded-md focus:outline-none focus:ring focus:ring-secondary"
       />
       <input
         type="password"
@@ -47,7 +47,7 @@ const RegisterForm = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
-        className="p-2 border rounded-md focus:outline-none focus:ring focus:ring-secondary"
+        className="p-3 border rounded-md focus:outline-none focus:ring focus:ring-secondary"
       />
       <input
         type="password"
@@ -55,11 +55,11 @@ const RegisterForm = () => {
         value={confirmPassword}
         onChange={(e) => setConfirmPassword(e.target.value)}
         required
-        className="p-2 border rounded-md focus:outline-none focus:ring focus:ring-secondary"
+        className="p-3 border rounded-md focus:outline-none focus:ring focus:ring-secondary"
       />
       <button
         type="submit"
-        className="bg-primary text-white py-2 px-4 rounded-md hover:bg-secondary transition"
+        className="bg-primary text-white py-3 px-5 rounded-md hover:bg-secondary transition"
       >
         Register
       </button>
