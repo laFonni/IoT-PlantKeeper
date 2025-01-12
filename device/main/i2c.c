@@ -1,7 +1,4 @@
 #include <esp_rom_sys.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
 
 #include "i2c.h"
 
