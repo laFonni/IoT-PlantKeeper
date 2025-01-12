@@ -58,6 +58,22 @@ const DevicePage = () => {
     fetchSensorData();
   }, [deviceId, token]);
 
+  const handlePublish = async () => {
+    try {
+      const topic = `iot/${deviceId}/commands`;
+      const message = JSON.stringify({ action: 'test', device: 'testDevice' });
+
+      await axios.post('http://localhost:4000/publish-mqtt', { topic, message }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      alert('Message published successfully');
+    } catch (err) {
+      console.error('Failed to publish message:', err);
+      alert('Failed to publish message');
+    }
+  };
+
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -149,6 +165,12 @@ const DevicePage = () => {
           </div>
         ))}
       </div>
+      <button
+        onClick={handlePublish}
+        className="mt-6 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition"
+      >
+        Publish MQTT Message
+      </button>
     </div>
   );
 };

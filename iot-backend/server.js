@@ -438,3 +438,21 @@ app.post('/devices/:deviceId/command', authenticate, (req, res) => {
         res.status(200).send(`Command sent to device ${deviceId}`);
     });
 });
+
+app.post('/publish-mqtt', authenticate, (req, res) => {
+    const { topic, message } = req.body;
+
+    if (!topic || !message) {
+        return res.status(400).send('Topic and message are required');
+    }
+
+    mqttClient.publish(topic, message, (err) => {
+        if (err) {
+            console.error('Failed to publish message:', err);
+            return res.status(500).send('Failed to publish message');
+        }
+
+        console.log(`Message published to topic ${topic}:`, message);
+        res.status(200).send(`Message published to topic ${topic}`);
+    });
+});
