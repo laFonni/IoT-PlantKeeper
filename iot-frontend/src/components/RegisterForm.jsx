@@ -1,51 +1,45 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const RegisterForm = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [status, setStatus] = useState('');
-  const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
-  
+
     if (password !== confirmPassword) {
-      setStatus('Passwords do not match.');
+      setStatus('Passwords do not match');
       return;
     }
-  
-    console.log('Sending request to backend:', { email, password }); // Logowanie danych
-  
+
     try {
-      const response = await axios.post('http://localhost:4000/register', { email, password });
-      console.log('Response from backend:', response.data); // Logowanie odpowiedzi
-      setStatus('Registration successful!');
-      setTimeout(() => {
-        navigate('/login');
-      }, 1500);
+      await axios.post('http://localhost:4000/register', { email, password });
+      setStatus('Registration successful');
+      navigate('/login'); // Redirect to login page
     } catch (err) {
-      console.error('Error from backend:', err); // Logowanie błędów
-      setStatus('Registration failed. User might already exist.');
+      console.error('Registration failed:', err);
+      setStatus('Registration failed');
     }
   };
-  
 
   return (
     <form
       onSubmit={handleRegister}
-      className="flex flex-col gap-4 p-6 max-w-md mx-auto mt-10 bg-white rounded-lg shadow-md border"
+      className="flex flex-col gap-4 p-8 bg-white rounded-lg shadow-lg max-w-md mx-auto mt-12"
     >
-      <h2 className="text-2xl font-bold text-center text-gray-700">Register</h2>
+      <h2 className="text-3xl font-bold text-center text-primary">Register</h2>
       <input
         type="email"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
-        className="p-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+        className="p-3 border rounded-md focus:outline-none focus:ring focus:ring-secondary"
       />
       <input
         type="password"
@@ -53,7 +47,7 @@ const RegisterForm = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
-        className="p-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+        className="p-3 border rounded-md focus:outline-none focus:ring focus:ring-secondary"
       />
       <input
         type="password"
@@ -61,11 +55,11 @@ const RegisterForm = () => {
         value={confirmPassword}
         onChange={(e) => setConfirmPassword(e.target.value)}
         required
-        className="p-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+        className="p-3 border rounded-md focus:outline-none focus:ring focus:ring-secondary"
       />
       <button
         type="submit"
-        className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600 transition"
+        className="bg-primary text-white py-3 px-5 rounded-md hover:bg-secondary transition"
       >
         Register
       </button>

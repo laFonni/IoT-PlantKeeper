@@ -175,9 +175,11 @@ app.post('/devices', authenticate, (req, res) => {
         return res.status(400).send('Name, MAC address, and WiFi ID are required');
     }
 
+    const userId = req.user.id; // Extract user ID from the authenticated request
+
     db.run(
-        'INSERT INTO IoTDevices (name, macAddress, wifiId) VALUES (?, ?, ?)',
-        [name, macAddress, wifiId],
+        'INSERT INTO IoTDevices (name, macAddress, wifiId, userId) VALUES (?, ?, ?, ?)',
+        [name, macAddress, wifiId, userId],
         function (err) {
             if (err) {
                 console.error('Failed to register device:', err);
@@ -188,7 +190,6 @@ app.post('/devices', authenticate, (req, res) => {
         }
     );
 });
-
 
 app.get('/devices', authenticate, (req, res) => {
     db.all(

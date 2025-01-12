@@ -17,7 +17,6 @@ const AddWiFiForm = ({ onAddWiFi }) => {
                 { ssid, password },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            console.log('Backend response:', response.data);
             setStatus('WiFi added successfully!');
             setSsid('');
             setPassword('');

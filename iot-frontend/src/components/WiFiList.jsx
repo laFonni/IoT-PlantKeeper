@@ -2,8 +2,8 @@ import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../AuthContext';
 
-const WiFiList = () => {
-    const { token } = useContext(AuthContext); // Access token from AuthContext
+const WiFiList = ({ networks: propNetworks }) => {
+    const { token } = useContext(AuthContext);
     const [networks, setNetworks] = useState([]);
 
     useEffect(() => {
@@ -23,8 +23,12 @@ const WiFiList = () => {
             }
         };
 
-        fetchWiFiNetworks();
-    }, [token]);
+        if (!propNetworks) {
+            fetchWiFiNetworks();
+        } else {
+            setNetworks(propNetworks);
+        }
+    }, [token, propNetworks]);
 
     // Delete a WiFi network
     const deleteWiFi = async (id) => {
@@ -41,7 +45,7 @@ const WiFiList = () => {
     
 
     return (
-        <div className="mt-6">
+        <div className="mt-6 w-full max-w-4xl mx-auto">
             <h2 className="text-xl font-bold mb-4">Your WiFi Networks</h2>
             <ul className="space-y-2">
                 {networks.map((network) => (

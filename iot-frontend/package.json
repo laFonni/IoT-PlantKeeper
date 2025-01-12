@@ -11,18 +11,16 @@
   },
   "dependencies": {
     "axios": "^1.7.9",
+    "chart.js": "^4.4.1",
     "cors": "^2.8.5",
     "mqtt": "^5.10.3",
     "react": "^18.3.1",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.3.1",
-<<<<<<< HEAD
     "react-native-bluetooth-classic": "^1.73.0-rc.12",
-    "react-router-dom": "^7.1.1"
-=======
     "react-router-dom": "^7.1.1",
-    "chart.js": "^4.4.1",
-    "react-chartjs-2": "^5.2.0"
->>>>>>> 24183e858e1bd87edf9d7e177e0639af58beaad9
+    "react-icons": "^5.4.0",
+    "react-router-dom": "^7.1.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
