@@ -58,6 +58,8 @@ async function populateDatabase() {
   });
 
   const sensorTypes = ['soilMoisture', 'temperature', 'lightLevel'];
+  const actuatorTypes = ['waterPump', 'lamp'];
+  const actuatorStates = [0, 1]; // 0 for off, 1 for on
   const now = new Date();
 
   db.serialize(() => {
@@ -72,6 +74,19 @@ async function populateDatabase() {
           (err) => {
             if (err) {
               console.error('Failed to insert telemetry data:', err);
+            }
+          }
+        );
+      });
+
+      actuatorTypes.forEach((type) => {
+        const value = actuatorStates[Math.floor(Math.random() * actuatorStates.length)];
+        db.run(
+          'INSERT INTO TelemetryData (deviceId, timestamp, sensorType, value) VALUES (?, ?, ?, ?)',
+          [deviceId, timestamp, type, value],
+          (err) => {
+            if (err) {
+              console.error('Failed to insert actuator data:', err);
             }
           }
         );

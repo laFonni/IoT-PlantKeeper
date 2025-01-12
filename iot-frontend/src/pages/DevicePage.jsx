@@ -30,7 +30,9 @@ const DevicePage = () => {
   const [sensorData, setSensorData] = useState({
     soilMoisture: [],
     temperature: [],
-    lightLevel: []
+    lightLevel: [],
+    waterPump: [],
+    lamp: []
   });
 
   useEffect(() => {
@@ -44,8 +46,10 @@ const DevicePage = () => {
         const soilMoisture = data.filter(d => d.sensorType === 'soilMoisture').map(d => ({ x: d.timestamp, y: d.value }));
         const temperature = data.filter(d => d.sensorType === 'temperature').map(d => ({ x: d.timestamp, y: d.value }));
         const lightLevel = data.filter(d => d.sensorType === 'lightLevel').map(d => ({ x: d.timestamp, y: d.value }));
+        const waterPump = data.filter(d => d.sensorType === 'waterPump').map(d => ({ x: d.timestamp, y: d.value }));
+        const lamp = data.filter(d => d.sensorType === 'lamp').map(d => ({ x: d.timestamp, y: d.value }));
 
-        setSensorData({ soilMoisture, temperature, lightLevel });
+        setSensorData({ soilMoisture, temperature, lightLevel, waterPump, lamp });
       } catch (err) {
         console.error('Failed to fetch sensor data:', err);
       }
@@ -103,6 +107,30 @@ const DevicePage = () => {
           data: sensorData.lightLevel.map(d => d.y),
           borderColor: 'rgb(255, 205, 86)',
           backgroundColor: 'rgba(255, 205, 86, 0.5)',
+        }]
+      }
+    },
+    {
+      title: 'Water Pump',
+      data: {
+        labels: sensorData.waterPump.map(d => d.x),
+        datasets: [{
+          label: 'Water Pump State',
+          data: sensorData.waterPump.map(d => d.y),
+          borderColor: 'rgb(75, 192, 192)',
+          backgroundColor: 'rgba(75, 192, 192, 0.5)',
+        }]
+      }
+    },
+    {
+      title: 'Lamp',
+      data: {
+        labels: sensorData.lamp.map(d => d.x),
+        datasets: [{
+          label: 'Lamp State',
+          data: sensorData.lamp.map(d => d.y),
+          borderColor: 'rgb(153, 102, 255)',
+          backgroundColor: 'rgba(153, 102, 255, 0.5)',
         }]
       }
     }
