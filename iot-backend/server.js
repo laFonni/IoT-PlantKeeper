@@ -44,7 +44,7 @@ const mqttClient = mqtt.connect('mqtt://localhost');
 
 mqttClient.on('connect', () => {
     console.log('Connected to MQTT broker');
-    mqttClient.subscribe('iot/+/data', (err) => {
+    mqttClient.subscribe('+/+/+', (err) => {
         if (err) console.error('Failed to subscribe to topic:', err);
     });
 });
@@ -54,6 +54,8 @@ mqttClient.on('message', (topic, message) => {
     const data = JSON.parse(message.toString());
 
     console.log(data);
+    console.log(deviceId);
+    console.log(_type);
 
     db.run(
         'INSERT INTO TelemetryData (deviceId, timestamp, sensorType, value) VALUES (?, ?, ?, ?)',
