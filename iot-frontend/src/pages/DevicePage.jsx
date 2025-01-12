@@ -43,10 +43,10 @@ const DevicePage = () => {
         });
         const data = response.data;
 
-        const soilMoisture = data.filter(d => d.sensorType === 'soilMoisture').map(d => ({ x: d.timestamp, y: d.value }));
+        const soilMoisture = data.filter(d => d.sensorType === 'soil_moisture').map(d => ({ x: d.timestamp, y: d.value }));
         const temperature = data.filter(d => d.sensorType === 'temperature').map(d => ({ x: d.timestamp, y: d.value }));
-        const lightLevel = data.filter(d => d.sensorType === 'lightLevel').map(d => ({ x: d.timestamp, y: d.value }));
-        const waterPump = data.filter(d => d.sensorType === 'waterPump').map(d => ({ x: d.timestamp, y: d.value }));
+        const lightLevel = data.filter(d => d.sensorType === 'light_sensor').map(d => ({ x: d.timestamp, y: d.value }));
+        const waterPump = data.filter(d => d.sensorType === 'water_pump').map(d => ({ x: d.timestamp, y: d.value }));
         const lamp = data.filter(d => d.sensorType === 'lamp').map(d => ({ x: d.timestamp, y: d.value }));
 
         setSensorData({ soilMoisture, temperature, lightLevel, waterPump, lamp });

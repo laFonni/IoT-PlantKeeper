@@ -44,13 +44,13 @@ const mqttClient = mqtt.connect('mqtt://localhost');
 
 mqttClient.on('connect', () => {
     console.log('Connected to MQTT broker');
-    mqttClient.subscribe('+/+/+', (err) => {
+    mqttClient.subscribe('+/+', (err) => {
         if (err) console.error('Failed to subscribe to topic:', err);
     });
 });
 
 mqttClient.on('message', (topic, message) => {
-    const [_, deviceMac, sensor_type] = topic.split('/');
+    const [deviceMac, sensor_type] = topic.split('/');
     const data = JSON.parse(message.toString());
 
     console.log(data);
@@ -75,7 +75,7 @@ mqttClient.on('message', (topic, message) => {
 
             db.run(
                 'INSERT INTO TelemetryData (deviceId, timestamp, sensorType, value) VALUES (?, ?, ?, ?)',
-                [deviceId, new Date().toISOString(), data.type, data.value],
+                [deviceId, new Date().toISOString(), sensor_type, data.value],
                 (err) => {
                     if (err) console.error('Failed to save telemetry data:', err);
                 }
