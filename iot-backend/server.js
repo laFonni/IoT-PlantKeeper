@@ -50,18 +50,36 @@ mqttClient.on('connect', () => {
 });
 
 mqttClient.on('message', (topic, message) => {
-    const [_, deviceId, _type] = topic.split('/');
+    const [_, deviceMac, sensor_type] = topic.split('/');
     const data = JSON.parse(message.toString());
 
     console.log(data);
-    console.log(deviceId);
-    console.log(_type);
+    console.log(deviceMac);
+    console.log(sensor_type);
 
-    db.run(
-        'INSERT INTO TelemetryData (deviceId, timestamp, sensorType, value) VALUES (?, ?, ?, ?)',
-        [deviceId, new Date().toISOString(), data.type, data.value],
-        (err) => {
-            if (err) console.error('Failed to save telemetry data:', err);
+    db.get(
+        'SELECT id FROM IoTDevices WHERE macAddress = ?',
+        [deviceMac],
+        (err, row) => {
+            if (err) {
+                console.error('Failed to retrieve device ID:', err);
+                return;
+            }
+
+            if (!row) {
+                console.error('Device not found for MAC address:', deviceMac);
+                return;
+            }
+
+            const deviceId = row.id;
+
+            db.run(
+                'INSERT INTO TelemetryData (deviceId, timestamp, sensorType, value) VALUES (?, ?, ?, ?)',
+                [deviceId, new Date().toISOString(), data.type, data.value],
+                (err) => {
+                    if (err) console.error('Failed to save telemetry data:', err);
+                }
+            );
         }
     );
 });
