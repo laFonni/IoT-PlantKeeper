@@ -1,15 +1,23 @@
-import React, { useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../AuthContext';
 import { FaLeaf, FaSignOutAlt, FaTachometerAlt } from 'react-icons/fa';
 
 const Navbar = () => {
   const { logout } = useContext(AuthContext);
+  const [email, setEmail] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('email');
+    if (savedEmail) {
+      setEmail(savedEmail);
+    }
+  }, []);
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/dashboard');
   };
 
   return (
@@ -21,6 +29,7 @@ const Navbar = () => {
             <span className="text-white font-serif text-xl">PlantKeeper</span>
           </Link>
           <div className="flex items-center space-x-4">
+            <span className="text-white">{email}</span> {/* Display email */}
             <Link
               to="/dashboard"
               className="flex items-center space-x-1 text-white hover:text-accent transition"

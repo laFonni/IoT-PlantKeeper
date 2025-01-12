@@ -13,8 +13,9 @@ const LoginForm = ({ onLogin }) => {
     
         try {
             const response = await axios.post('http://localhost:4000/login', { email, password });
-            localStorage.setItem('token', response.data.token); // Save to localStorage
-            onLogin(response.data.token); // Pass token to context
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('email', email);
+            onLogin(response.data.token, email); // Pass token and email to context
             navigate('/dashboard');
         } catch (err) {
             console.error('Login failed:', err);
