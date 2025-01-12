@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import getPublicIP from '../helpers';
+
 
 const BluetoothSetup = () => {
     const [networks, setNetworks] = useState([]); // Available WiFi networks
@@ -55,7 +57,7 @@ const BluetoothSetup = () => {
             setLog('Requesting Bluetooth device...');
             const selectedDevice = await navigator.bluetooth.requestDevice({
                 acceptAllDevices: true, // Allows all Bluetooth devices
-                optionalServices: ['battery_service'], // Replace with your ESP32 service UUID
+                optionalServices: [0xFF00], // Replace with your ESP32 service UUID
             });
 
             setDevice(selectedDevice);
@@ -80,13 +82,24 @@ const BluetoothSetup = () => {
 
         setJsonPayload(JSON.stringify(payload, null, 2)); // Display the JSON payload
 
+        let ip_addr = '192.168.71.39'; //await getPublicIP();
+
         try {
             const server = await device.gatt.connect();
-            const service = await server.getPrimaryService('your-service-uuid'); // Replace with your ESP32's service UUID
-            const characteristic = await service.getCharacteristic('your-characteristic-uuid'); // Replace with your ESP32's characteristic UUID
+            const service = await server.getPrimaryService(0xFF00); // Replace with your ESP32's service UUID
+            const characteristic_SSID = await service.getCharacteristic(0xFF01); // Replace with your ESP32's characteristic UUID
+            const characteristic_password = await service.getCharacteristic(0xFF02); // Replace with your ESP32's characteristic UUID
+            const characteristic_MQTT = await service.getCharacteristic(0xFF03); // Replace with your ESP32's characteristic UUID
 
-            const credentials = new TextEncoder().encode(JSON.stringify(payload));
-            await characteristic.writeValue(credentials);
+            const credentials_SSID = new TextEncoder().encode(payload.ssid);
+            const credentials_password = new TextEncoder().encode(payload.password);
+            const credentials_MQTT = new TextEncoder().encode(`${ip_addr}:1883`);
+
+            console.log(ip_addr);
+
+            await characteristic_SSID.writeValue(credentials_SSID);
+            await characteristic_password.writeValue(credentials_password);
+            await characteristic_MQTT.writeValue(credentials_MQTT);
 
             setLog(`WiFi credentials sent to ESP32: ${JSON.stringify(payload)}`);
         } catch (error) {

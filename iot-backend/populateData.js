@@ -49,7 +49,7 @@ async function populateDatabase() {
   const wifiId1 = await new Promise((resolve, reject) => {
     db.run(
       'INSERT INTO WiFiNetworks (ssid, password, userId) VALUES (?, ?, ?)',
-      ['Galaxy A15 57B3', 'wifiPassword', userId1],
+      ['Galaxy A15 57B3', '1234qwer', userId1],
       function (err) {
         if (err) {
           console.error('Failed to insert WiFi network:', err);

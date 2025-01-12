@@ -53,6 +53,8 @@ mqttClient.on('message', (topic, message) => {
     const [_, deviceId, _type] = topic.split('/');
     const data = JSON.parse(message.toString());
 
+    console.log(data);
+
     db.run(
         'INSERT INTO TelemetryData (deviceId, timestamp, sensorType, value) VALUES (?, ?, ?, ?)',
         [deviceId, new Date().toISOString(), data.type, data.value],
