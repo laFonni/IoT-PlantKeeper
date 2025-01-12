@@ -1,0 +1,5 @@
+#define SOIL_MOISTURE_TOPIC_SUFFIX "/user_1/plant_monitor_1/soil_moisture_sensor/soil_moisture"
+#define TEMPERATURE_TOPIC_SUFFIX "/user_1/plant_monitor_1/temperature_sensor/temperature"
+#define WATER_PUMP_TOPIC_SUFFIX "/user_1/plant_monitor_1/water_pump/activate"
+#define LIGHT_SENSOR_TOPIC_SUFFIX "/user_1/plant_monitor_1/light_sensor/light"
+#define LIGHT_EMITTER_TOPIC_SUFFIX "/user_1/plant_monitor_1/light_emitter/activate"
