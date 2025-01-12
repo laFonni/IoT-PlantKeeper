@@ -1,1 +1,3 @@
 device/build
+iot-backend/node_modules
+iot-backend/iot.db
