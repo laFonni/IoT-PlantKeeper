@@ -1,28 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../AuthContext';
 
-const DeviceList = ({ token, devices }) => {
+const DeviceList = () => {
+  const { token } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [deviceList, setDeviceList] = useState(devices);
+  const [deviceList, setDeviceList] = useState([]);
 
   useEffect(() => {
     const fetchDevices = async () => {
+      if (!token) {
+        console.error('No token available in DeviceList');
+        return;
+      }
+
       try {
         const response = await axios.get('http://localhost:4000/devices', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setDeviceList(response.data);
       } catch (err) {
-        alert('Failed to fetch devices');
+        console.error('Failed to fetch devices:', err);
       }
     };
     fetchDevices();
   }, [token]);
-
-  useEffect(() => {
-    setDeviceList(devices);
-  }, [devices]);
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
