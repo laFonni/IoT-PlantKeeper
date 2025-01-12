@@ -2,13 +2,12 @@ import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../AuthContext';
 
-const WiFiList = () => {
-    const { token } = useContext(AuthContext); // Access token from AuthContext
+const WiFiList = ({ networks: propNetworks }) => {
+    const { token } = useContext(AuthContext);
     const [networks, setNetworks] = useState([]);
 
     useEffect(() => {
         const fetchWiFiNetworks = async () => {
-
             if (!token) {
                 console.error('No token available in WiFiList');
                 return;
@@ -24,8 +23,12 @@ const WiFiList = () => {
             }
         };
 
-        fetchWiFiNetworks();
-    }, [token]);
+        if (!propNetworks) {
+            fetchWiFiNetworks();
+        } else {
+            setNetworks(propNetworks);
+        }
+    }, [token, propNetworks]);
 
     return (
         <div className="mt-6">

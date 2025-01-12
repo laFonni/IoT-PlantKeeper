@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../AuthContext';
 
-const DeviceList = () => {
+const DeviceList = ({ devices: propDevices }) => {
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
   const [deviceList, setDeviceList] = useState([]);
@@ -24,8 +24,13 @@ const DeviceList = () => {
         console.error('Failed to fetch devices:', err);
       }
     };
-    fetchDevices();
-  }, [token]);
+
+    if (!propDevices) {
+      fetchDevices();
+    } else {
+      setDeviceList(propDevices);
+    }
+  }, [token, propDevices]);
 
   return (
     <div className="p-6 max-w-3xl mx-auto bg-background">
