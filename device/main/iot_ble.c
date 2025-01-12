@@ -253,9 +253,11 @@ static void gatts_profile_wifi_event_handler(esp_gatts_cb_event_t event, esp_gat
         ESP_LOGI(GATTS_TAG, "REGISTER_APP_EVT, status %d, app_id %d\n", param->reg.status, param->reg.app_id);
         gl_profile_tab[PROFILE_WIFI_APP_ID].service_id.is_primary = true;
         gl_profile_tab[PROFILE_WIFI_APP_ID].service_id.id.inst_id = 0x00;
-        gl_profile_tab[PROFILE_WIFI_APP_ID].service_id.id.uuid.len = ESP_UUID_LEN_128;
-        memcpy(gl_profile_tab[PROFILE_WIFI_APP_ID].service_id.id.uuid.uuid.uuid128, 
-               WIFI_CONFIG_SERVICE_UUID_128, ESP_UUID_LEN_128);
+        // gl_profile_tab[PROFILE_WIFI_APP_ID].service_id.id.uuid.len = ESP_UUID_LEN_128;
+        // memcpy(gl_profile_tab[PROFILE_WIFI_APP_ID].service_id.id.uuid.uuid.uuid128, 
+        //        WIFI_CONFIG_SERVICE_UUID_128, ESP_UUID_LEN_128);
+        gl_profile_tab[PROFILE_WIFI_APP_ID].service_id.id.uuid.len = ESP_UUID_LEN_16;
+        gl_profile_tab[PROFILE_WIFI_APP_ID].service_id.id.uuid.uuid.uuid16 = WIFI_CONFIG_SERVICE_UUID_16;
 
         esp_err_t set_dev_name_ret = esp_ble_gap_set_device_name("ESP_WIFI_CONFIG");
         if (set_dev_name_ret){
@@ -378,17 +380,14 @@ static void gatts_profile_wifi_event_handler(esp_gatts_cb_event_t event, esp_gat
         gl_profile_tab[PROFILE_WIFI_APP_ID].service_handle = param->create.service_handle;
 
         // Add SSID characteristic with 128-bit UUID
-        esp_bt_uuid_t ssid_uuid = {
-            .len = ESP_UUID_LEN_128,
-            .uuid.uuid128 = WIFI_SSID_CHAR_UUID_128,
-        };
-        
-        // Add user description descriptor
-        // esp_bt_uuid_t ssid_descr_uuid = {
-        //     .len = ESP_UUID_LEN_16,
-        //     .uuid.uuid16 = ESP_GATT_UUID_CHAR_DESCRIPTION,
+        // esp_bt_uuid_t ssid_uuid = {
+        //     .len = ESP_UUID_LEN_128,
+        //     .uuid.uuid128 = WIFI_SSID_CHAR_UUID_128,
         // };
-        
+        esp_bt_uuid_t ssid_uuid = {
+            .len = ESP_UUID_LEN_16,
+            .uuid.uuid16 = WIFI_SSID_CHAR_UUID_16,
+        };
         esp_ble_gatts_add_char(gl_profile_tab[PROFILE_WIFI_APP_ID].service_handle,
                               &ssid_uuid,
                               ESP_GATT_PERM_WRITE,
@@ -396,11 +395,14 @@ static void gatts_profile_wifi_event_handler(esp_gatts_cb_event_t event, esp_gat
                               NULL, NULL);
                               
         // Add Password characteristic with 128-bit UUID
+        // esp_bt_uuid_t pass_uuid = {
+        //     .len = ESP_UUID_LEN_128,
+        //     .uuid.uuid128 = WIFI_PASS_CHAR_UUID_128,
+        // };
         esp_bt_uuid_t pass_uuid = {
-            .len = ESP_UUID_LEN_128,
-            .uuid.uuid128 = WIFI_PASS_CHAR_UUID_128,
+            .len = ESP_UUID_LEN_16,
+            .uuid.uuid16 = WIFI_PASS_CHAR_UUID_16,
         };
-        
         esp_ble_gatts_add_char(gl_profile_tab[PROFILE_WIFI_APP_ID].service_handle,
                               &pass_uuid,
                               ESP_GATT_PERM_WRITE,
@@ -408,11 +410,14 @@ static void gatts_profile_wifi_event_handler(esp_gatts_cb_event_t event, esp_gat
                               NULL, NULL);
 
         // Add MQTT URL characteristic with 128-bit UUID
+        // esp_bt_uuid_t mqtt_url_uuid = {
+        //     .len = ESP_UUID_LEN_128,
+        //     .uuid.uuid128 = WIFI_MQTT_URL_CHAR_UUID_128,
+        // };
         esp_bt_uuid_t mqtt_url_uuid = {
-            .len = ESP_UUID_LEN_128,
-            .uuid.uuid128 = WIFI_MQTT_URL_CHAR_UUID_128,
+            .len = ESP_UUID_LEN_16,
+            .uuid.uuid16 = WIFI_MQTT_URL_CHAR_UUID_16,
         };
-        
         esp_ble_gatts_add_char(gl_profile_tab[PROFILE_WIFI_APP_ID].service_handle,
                               &mqtt_url_uuid,
                               ESP_GATT_PERM_WRITE,
@@ -431,14 +436,20 @@ static void gatts_profile_wifi_event_handler(esp_gatts_cb_event_t event, esp_gat
                 param->add_char.status, param->add_char.attr_handle, param->add_char.service_handle);
         
         // Store the handle based on the UUID
-        if (strcmp((char*)(param->add_char.char_uuid.uuid.uuid128), WIFI_SSID_CHAR_UUID_128) == 0) {
+        // if (strcmp((char*)(param->add_char.char_uuid.uuid.uuid128), WIFI_SSID_CHAR_UUID_128) == 0) {
+        //     gl_profile_tab[PROFILE_WIFI_APP_ID].ssid_char_handle = param->add_char.attr_handle;
+        // } else if (strcmp((char*)(param->add_char.char_uuid.uuid.uuid128), WIFI_PASS_CHAR_UUID_128) == 0) {
+        //     gl_profile_tab[PROFILE_WIFI_APP_ID].pass_char_handle = param->add_char.attr_handle;
+        // } else if (strcmp((char*)(param->add_char.char_uuid.uuid.uuid128), WIFI_MQTT_URL_CHAR_UUID_128) == 0) {
+        //     gl_profile_tab[PROFILE_WIFI_APP_ID].mqtt_url_char_handle = param->add_char.attr_handle;
+        // }
+        if (param->add_char.char_uuid.uuid.uuid16 == WIFI_SSID_CHAR_UUID_16) {
             gl_profile_tab[PROFILE_WIFI_APP_ID].ssid_char_handle = param->add_char.attr_handle;
-        } else if (strcmp((char*)(param->add_char.char_uuid.uuid.uuid128), WIFI_PASS_CHAR_UUID_128) == 0) {
+        } else if (param->add_char.char_uuid.uuid.uuid16 == WIFI_PASS_CHAR_UUID_16) {
             gl_profile_tab[PROFILE_WIFI_APP_ID].pass_char_handle = param->add_char.attr_handle;
-        } else if (strcmp((char*)(param->add_char.char_uuid.uuid.uuid128), WIFI_MQTT_URL_CHAR_UUID_128) == 0) {
+        } else if (param->add_char.char_uuid.uuid.uuid16 == WIFI_MQTT_URL_CHAR_UUID_16) {
             gl_profile_tab[PROFILE_WIFI_APP_ID].mqtt_url_char_handle = param->add_char.attr_handle;
         }
-        
         // Keep the rest of the existing code in this case...
         gl_profile_tab[PROFILE_WIFI_APP_ID].char_handle = param->add_char.attr_handle;
         gl_profile_tab[PROFILE_WIFI_APP_ID].descr_uuid.len = ESP_UUID_LEN_16;

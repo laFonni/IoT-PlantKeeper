@@ -5,6 +5,7 @@
 static bool calibration_enabled = false;
 static adc_oneshot_unit_handle_t adc1_handle;
 static adc_cali_handle_t cali_handle = NULL;
+static adc_channel_t adc_channel;
 
 void iot_photoresistor_init(adc_unit_t unit, adc_channel_t channel, adc_atten_t atten) {
     adc_oneshot_unit_init_cfg_t unit_cfg = {
@@ -31,11 +32,12 @@ void iot_photoresistor_init(adc_unit_t unit, adc_channel_t channel, adc_atten_t 
     } else {
         printf("ADC calibration could not be initialized. Raw values will be used.\n");
     }
+    adc_channel = channel;
 }
 
-int32_t iot_photoresistor_get(adc_channel_t channel) {
+int32_t iot_photoresistor_get(void) {
     int raw_value;
-    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, channel, &raw_value));
+    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, adc_channel, &raw_value));
 
     if (calibration_enabled) {
         int voltage;
@@ -45,7 +47,7 @@ int32_t iot_photoresistor_get(adc_channel_t channel) {
     return raw_value;
 }
 
-void iot_photoresistor_deinit() {
+void iot_photoresistor_deinit(void) {
     if (calibration_enabled) {
         adc_cali_delete_scheme_line_fitting(cali_handle);
     }

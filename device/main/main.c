@@ -12,7 +12,8 @@
 #include "iot_nvs.h"
 #include "iot_mqtt.h"
 #include "i2c.h"
-#include "topics.h"
+#include "iot_time.h"
+#include "iot_mac.h"
 
 // Setup mode config
 #define BUTTON_GPIO GPIO_NUM_0
@@ -39,36 +40,38 @@ void app_main(void) {
     iot_wifi_init();
     iot_reconfigure_init(LED_GPIO, BUTTON_GPIO);
 
+    get_mac_address();
+
     i2c_device_t i2c;
     i2c_init(&i2c, I2C_SDA_PIN, I2C_SCL_PIN, "I2C_TEST");
     get_calibration_params(i2c);
+    device = i2c;
 
     iot_photoresistor_init(ADC_UNIT, ADC_CHANNEL, ADC_ATTEN);
     iot_soil_moisture_init(SOIL_GPIO);  
     iot_light_init(LIGHT_GPIO);
 
+    initialize_sntp();
+
     char ssid[64], pass[64];
     get_wifi_credentials_nvs(ssid, pass);
     iot_wifi_start(ssid, pass);
 
-    while (true) {
-        if (wifi_connected) {
-            trigger_measurment(i2c);
-            int32_t result;
-            read_temp(i2c, &result);
-            int32_t temperature = bmp280_compensate_T_int32(result);
-            printf("Temperature: %f\n", temperature / 100.0);
-            printf("Light: %ld\n", iot_photoresistor_get(ADC_CHANNEL));
-            printf("Is wet: %d\n", is_soil_wet(SOIL_GPIO));
+    // while (true) {
+    //     if (wifi_connected && time_synchronized) {
+    //         char timestamp[64];
+    //         get_timestamp(timestamp);
+    //         printf("Timestamp: %s\n", timestamp);
+    //         printf("Temperature: %f\n", get_temp_deg(i2c));
+    //         printf("Light: %ld\n", iot_photoresistor_get());
+    //         printf("Is wet: %d\n", is_soil_wet());
 
-            gpio_set_level(LIGHT_GPIO, 1);
-            vTaskDelay(500 / portTICK_PERIOD_MS);
-            gpio_set_level(LIGHT_GPIO, 0);
-            vTaskDelay(500 / portTICK_PERIOD_MS);
-        }
+    //         gpio_set_level(LIGHT_GPIO, 1);
+    //         vTaskDelay(500 / portTICK_PERIOD_MS);
+    //         gpio_set_level(LIGHT_GPIO, 0);
+    //         vTaskDelay(500 / portTICK_PERIOD_MS);
+    //     }
 
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
-    }
-
-    return;
+    //     vTaskDelay(2000 / portTICK_PERIOD_MS);
+    // }
 }

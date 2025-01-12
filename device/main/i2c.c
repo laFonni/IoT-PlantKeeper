@@ -16,6 +16,8 @@ int32_t bmp280_compensate_T_int32(int32_t adc_T) {
 
 calib_t calib;
 
+i2c_device_t device;
+
 int get_calibration_params(i2c_device_t i2c) {
     printf("Odczyt kalibracyjny: wysłanie adresu\n");
     i2c_start(&i2c);
@@ -184,6 +186,14 @@ int read_temp(i2c_device_t i2c, int32_t *result) {
     printf("%x %x %x %x %x %x %x\n", data_F6, data_F7, data_F8, data_F9, data_FA, data_FB, data_FC);
     *result = (data_FA << 12) | (data_FB << 4) | (data_FC >> 4);
     return 0;
+}
+
+double get_temp_deg(i2c_device_t i2c) {
+    trigger_measurment(i2c);
+    int32_t result;
+    read_temp(i2c, &result);
+    int32_t temperature = bmp280_compensate_T_int32(result);
+    return temperature / 100.0;
 }
 
 static void i2c_delay() {
