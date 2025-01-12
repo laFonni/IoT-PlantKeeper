@@ -5,6 +5,7 @@
 #include "iot_wifi.h"
 #include "iot_nvs.h"
 #include "iot_mqtt.h"
+#include "iot_time.h"
 
 bool wifi_connected = false;
 static esp_event_handler_instance_t wifi_handler_event_instance;
@@ -33,6 +34,8 @@ static void ip_event_handler(void* arg, esp_event_base_t event_base, int32_t eve
         ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
         printf("Uzyskany adres IP: " IPSTR "\n", IP2STR(&event->ip_info.ip));
 
+        wait_for_time_sync();
+
         char mqtt_uri[64];
         get_mqtt_uri(mqtt_uri);
         iot_mqtt_init(mqtt_uri);
@@ -52,7 +55,6 @@ void iot_wifi_init(void) {
 }
 
 void iot_wifi_start(const char* ssid, const char* pass) {
-    // wifi_event_group = xEventGroupCreate();
     wifi_config_t wifi_config = {
         .sta = {
             .ssid = "",
