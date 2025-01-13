@@ -81,11 +81,9 @@ const DevicePage = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      alert('Message published successfully');
       setLampState(prevState => (prevState === 0 ? 1 : 0));
     } catch (err) {
       console.error('Failed to publish message:', err);
-      alert('Failed to publish message');
     }
   };
 
