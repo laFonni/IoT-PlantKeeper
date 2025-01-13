@@ -53,9 +53,7 @@ mqttClient.on('message', (topic, message) => {
     const [deviceMac, sensor_type] = topic.split('/');
     const data = JSON.parse(message.toString());
 
-    console.log(data);
-    console.log(deviceMac);
-    console.log(sensor_type);
+    console.log(`Received message on topic ${topic}:`, data);
 
     db.get(
         'SELECT id FROM IoTDevices WHERE macAddress = ?',
@@ -73,6 +71,7 @@ mqttClient.on('message', (topic, message) => {
 
             const deviceId = row.id;
 
+            // Insert telemetry data into the database
             db.run(
                 'INSERT INTO TelemetryData (deviceId, timestamp, sensorType, value) VALUES (?, ?, ?, ?)',
                 [deviceId, new Date().toISOString(), sensor_type, data.value],
@@ -80,6 +79,36 @@ mqttClient.on('message', (topic, message) => {
                     if (err) console.error('Failed to save telemetry data:', err);
                 }
             );
+
+            // Check if the sensor type is "light"
+            if (sensor_type === 'light_sensor') {
+                // Retrieve the most recent light sensor record for this device
+                db.get(
+                    'SELECT value FROM TelemetryData WHERE deviceId = ? AND sensorType = ? ORDER BY timestamp DESC LIMIT 1',
+                    [deviceId, 'light_sensor'],
+                    (err, row) => {
+                        if (err) {
+                            console.error('Failed to retrieve light sensor data:', err);
+                            return;
+                        }
+
+                        if (row) {
+                            const lightValue = row.value;
+                            const lampTopic = `${deviceMac}/lamp`;
+                            const lampState = lightValue < 2000 ? 1 : 0;
+
+                            // Publish the lamp state to the appropriate topic
+                            mqttClient.publish(lampTopic, lampState.toString(), (err) => {
+                                if (err) {
+                                    console.error('Failed to publish lamp state:', err);
+                                } else {
+                                    console.log(`Lamp state updated to ${lampState} on topic ${lampTopic}`);
+                                }
+                            });
+                        }
+                    }
+                );
+            }
         }
     );
 });
