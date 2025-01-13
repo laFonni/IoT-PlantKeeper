@@ -409,6 +409,24 @@ app.post('/wifi-credentials', authenticate, (req, res) => {
     );
 });
 
+app.get('/devices/:deviceId/mac', authenticate, (req, res) => {
+    const { deviceId } = req.params;
+
+    db.get(
+        'SELECT macAddress FROM IoTDevices WHERE id = ? AND userId = ?',
+        [deviceId, req.user.id],
+        (err, row) => {
+            if (err) {
+                console.error('Failed to fetch MAC address:', err);
+                return res.status(500).send('Failed to fetch MAC address');
+            }
+            if (!row) {
+                return res.status(404).send('Device not found');
+            }
+            res.status(200).send({ macAddress: row.macAddress });
+        }
+    );
+});
 
 // Start the server
 app.listen(port, () => {
