@@ -60,8 +60,8 @@ const DevicePage = () => {
 
   const handlePublish = async () => {
     try {
-      const topic = `iot/${deviceId}/commands`;
-      const message = JSON.stringify({ action: 'test', device: 'testDevice' });
+      const topic = `${deviceId}/lamp`;
+      const message = "1";
 
       await axios.post('http://localhost:4000/publish-mqtt', { topic, message }, {
         headers: { Authorization: `Bearer ${token}` }
