@@ -50,7 +50,7 @@ const DevicePage = () => {
         const temperature = data.filter(d => d.sensorType === 'temperature').map(d => ({ x: d.timestamp, y: d.value }));
         const lightLevel = data.filter(d => d.sensorType === 'light_sensor').map(d => ({ x: d.timestamp, y: d.value }));
         const waterPump = data.filter(d => d.sensorType === 'water_pump').map(d => ({ x: d.timestamp, y: d.value }));
-        const lamp = data.filter(d => d.sensorType === 'lamp').map(d => ({ x: d.timestamp, y: d.value }));
+        const lamp = data.filter(d => d.sensorType === 'light_emitter').map(d => ({ x: d.timestamp, y: d.value }));
 
         setSensorData({ soilMoisture, temperature, lightLevel, waterPump, lamp });
       } catch (err) {
@@ -160,18 +160,18 @@ const DevicePage = () => {
         }]
       }
     },
-    {
-      title: 'Water Pump',
-      data: {
-        labels: sensorData.waterPump.map(d => d.x),
-        datasets: [{
-          label: 'Water Pump State',
-          data: sensorData.waterPump.map(d => d.y),
-          borderColor: 'rgb(75, 192, 192)',
-          backgroundColor: 'rgba(75, 192, 192, 0.5)',
-        }]
-      }
-    },
+    // {
+    //   title: 'Water Pump',
+    //   data: {
+    //     labels: sensorData.waterPump.map(d => d.x),
+    //     datasets: [{
+    //       label: 'Water Pump State',
+    //       data: sensorData.waterPump.map(d => d.y),
+    //       borderColor: 'rgb(75, 192, 192)',
+    //       backgroundColor: 'rgba(75, 192, 192, 0.5)',
+    //     }]
+    //   }
+    // },
     {
       title: 'Lamp',
       data: {

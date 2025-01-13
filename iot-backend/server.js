@@ -80,35 +80,47 @@ mqttClient.on('message', (topic, message) => {
                 }
             );
 
-            // Check if the sensor type is "light"
-            if (sensor_type === 'light_sensor') {
-                // Retrieve the most recent light sensor record for this device
-                db.get(
-                    'SELECT value FROM TelemetryData WHERE deviceId = ? AND sensorType = ? ORDER BY timestamp DESC LIMIT 1',
-                    [deviceId, 'light_sensor'],
-                    (err, row) => {
-                        if (err) {
-                            console.error('Failed to retrieve light sensor data:', err);
-                            return;
-                        }
-
-                        if (row) {
-                            const lightValue = row.value;
-                            const lampTopic = `${deviceMac}/lamp`;
-                            const lampState = lightValue < 2000 ? 1 : 0;
-
-                            // Publish the lamp state to the appropriate topic
-                            mqttClient.publish(lampTopic, lampState.toString(), (err) => {
-                                if (err) {
-                                    console.error('Failed to publish lamp state:', err);
-                                } else {
-                                    console.log(`Lamp state updated to ${lampState} on topic ${lampTopic}`);
-                                }
-                            });
-                        }
-                    }
-                );
+            // When the sensor type is "light_sensor", process the light sensor value and control the lamp
+if (sensor_type === 'light_sensor') {
+    db.get(
+        'SELECT value FROM TelemetryData WHERE deviceId = ? AND sensorType = ? ORDER BY timestamp DESC LIMIT 1',
+        [deviceId, 'light_sensor'],
+        (err, row) => {
+            if (err) {
+                console.error('Failed to retrieve light sensor data:', err);
+                return;
             }
+
+            if (row) {
+                const lightValue = row.value;
+                const lampTopic = `${deviceMac}/lamp`;
+                const lampState = lightValue < 2000 ? 1 : 0;
+
+                // Publish the lamp state to the appropriate topic
+                mqttClient.publish(lampTopic, lampState.toString(), (err) => {
+                    if (err) {
+                        console.error('Failed to publish lamp state:', err);
+                    } else {
+                        console.log(`Lamp state updated to ${lampState} on topic ${lampTopic}`);
+
+                        // Save the lamp state as a new sensor record in the database
+                        db.run(
+                            'INSERT INTO TelemetryData (deviceId, timestamp, sensorType, value) VALUES (?, ?, ?, ?)',
+                            [deviceId, new Date().toISOString(), 'light_emitter', lampState],
+                            (err) => {
+                                if (err) {
+                                    console.error('Failed to save lamp state as sensor record:', err);
+                                } else {
+                                    console.log('Lamp state saved as light_emitter record in database.');
+                                }
+                            }
+                        );
+                    }
+                });
+            }
+        }
+    );
+}
         }
     );
 });
