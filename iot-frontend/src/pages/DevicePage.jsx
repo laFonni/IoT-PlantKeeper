@@ -182,7 +182,7 @@ const DevicePage = () => {
         onClick={handlePublish}
         className="mt-6 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition"
       >
-        {lampState === 0 ? 'Turn Lamp On' : 'Turn Lamp Off'}
+        {lampState === 0 ? 'Turn Lamp Off' : 'Turn Lamp On'}
       </button>
     </div>
   );
