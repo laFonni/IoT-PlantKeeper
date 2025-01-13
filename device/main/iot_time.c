@@ -3,6 +3,7 @@
 #include <esp_sntp.h>
 
 #include "iot_time.h"
+#include "iot_reconfigure.h"
 
 bool time_synchronized = false;
 
@@ -19,7 +20,10 @@ void wait_for_time_sync(void) {
     time_t now = 0;
     struct tm timeinfo = { 0 };
 
-    while (timeinfo.tm_year < (2023 - 1900)) {
+    while (timeinfo.tm_year < (2025 - 1900)) {
+        if (setup_mode) {
+            return;
+        }
         printf("Synchronizowanie czasu...\n");
         time(&now);
         localtime_r(&now, &timeinfo);

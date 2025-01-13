@@ -16,5 +16,5 @@ void iot_light_on(void) {
 }
 
 void iot_light_off(void) {
-    gpio_set_level(led_gpio, 1);
+    gpio_set_level(led_gpio, 0);
 }

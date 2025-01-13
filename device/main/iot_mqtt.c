@@ -47,9 +47,11 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t event_base, 
         mqtt_connected = true;
         printf("Połączono z brokerem MQTT.\n");
 
-        char topic[64];
-        sprintf(topic, "%s/lamp", mac_address);
-        esp_mqtt_client_subscribe(mqtt_client, topic, 1);
+        char topic_lamp[64], topic_pump[64];
+        sprintf(topic_lamp, "%s/lamp", mac_address);
+        sprintf(topic_pump, "%s/pump", mac_address);
+        esp_mqtt_client_subscribe(mqtt_client, topic_lamp, 1);
+        esp_mqtt_client_subscribe(mqtt_client, topic_pump, 1);
 
         if (mqtt_publish_task_handle == NULL) {
             xTaskCreate(mqtt_publish_task, "publish", 4096, NULL, 1, &mqtt_publish_task_handle);
@@ -71,15 +73,27 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t event_base, 
         printf("Topic: %.*s\n", event->topic_len, event->topic);
         printf("Dane: %.*s\n", event->data_len, event->data);
 
-        if (false) {
-            iot_light_on();
-            iot_light_off();
+        char topic_lamp[64], topic_pump[64];
+        sprintf(topic_lamp, "%s/lamp", mac_address);
+        sprintf(topic_pump, "%s/pump", mac_address);
+
+        if (strncmp(topic_lamp, event->topic, event->topic_len) == 0) {
+            if (strncmp("1", event->data, event->data_len) == 0) {
+                iot_light_on();
+            } else {
+                iot_light_off();
+            }
+        } else if (strncmp(topic_pump, event->topic, event->topic_len) == 0) {
+            if (strncmp("1", event->data, event->data_len) == 0) {
+                printf("Pump turned on\n");
+            } else {
+                printf("Pump turned off\n");
+            }
         }
     }
 }
 
 static void mqtt_publish_task(void* pvParameters) {
-    int i = 0;
     while (true) {
         char timestamp[64];
         get_timestamp(timestamp);

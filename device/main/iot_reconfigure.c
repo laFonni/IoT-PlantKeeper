@@ -7,7 +7,7 @@
 
 #include "iot_reconfigure.h"
 
-static bool setup_mode = false;
+bool setup_mode = false;
 static gpio_num_t led_gpio;
 static gpio_num_t button_gpio;
 static TaskHandle_t blinking_task_handle = NULL;
