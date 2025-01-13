@@ -36,6 +36,7 @@ const DevicePage = () => {
   });
   const [lampState, setLampState] = useState(0);
   const [macAddress, setMacAddress] = useState('');
+  const [frequency, setFrequency] = useState('');
 
   useEffect(() => {
     const fetchSensorData = async () => {
@@ -84,6 +85,26 @@ const DevicePage = () => {
       setLampState(prevState => (prevState === 0 ? 1 : 0));
     } catch (err) {
       console.error('Failed to publish message:', err);
+    }
+  };
+
+  const handlePublishFrequency = async () => {
+    try {
+      if (isNaN(frequency) || frequency.trim() === '') {
+        alert('Please enter a valid number for the frequency.');
+        return;
+      }
+
+      const topic = `${macAddress}/frequency`;
+      const message = (frequency * 1000).toString();
+
+      await axios.post('http://localhost:4000/publish-mqtt', { topic, message }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      //alert('Frequency successfully published!');
+    } catch (err) {
+      console.error('Failed to publish frequency:', err);
     }
   };
 
@@ -184,6 +205,21 @@ const DevicePage = () => {
       >
         {lampState === 0 ? 'Turn Lamp Off' : 'Turn Lamp On'}
       </button>
+      <div className="mt-6 flex items-center gap-4">
+        <input
+          type="text"
+          value={frequency}
+          onChange={(e) => setFrequency(e.target.value)}
+          placeholder="Enter measurement interval [s]"
+          className="py-2 px-4 border rounded-md"
+        />
+        <button
+          onClick={handlePublishFrequency}
+          className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition"
+        >
+          Update Frequency
+        </button>
+      </div>
     </div>
   );
 };
