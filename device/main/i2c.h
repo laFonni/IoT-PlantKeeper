@@ -30,6 +30,8 @@ typedef struct {
 extern calib_t calib;
 extern int32_t t_fine;
 
+extern i2c_device_t device;
+
 void i2c_init(i2c_device_t *i2c, gpio_num_t sda, gpio_num_t scl, const char *name);
 void i2c_start(i2c_device_t *i2c);
 void i2c_stop(i2c_device_t *i2c);
@@ -39,3 +41,4 @@ int get_calibration_params(i2c_device_t i2c);
 int trigger_measurment(i2c_device_t i2c);
 int read_temp(i2c_device_t i2c, int32_t *result);
 int32_t bmp280_compensate_T_int32(int32_t adc_T);
+double get_temp_deg(i2c_device_t i2c);
